@@ -1,0 +1,48 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Tue Mar 05 14:53:25 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000046
+                   .cinit    romdata   0x000023    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/NEWPIC_       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000024      
+                            0x002007    0x002007      
+            38 out of 2182 program addresses used, program memory utilization is 1%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   ETAPA0   0x00000a    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA1   0x00000d    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA2   0x000010    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA3   0x000013    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA4   0x000016    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA5   0x000019    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA6   0x00001c    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA7   0x00001f    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                   ETAPA0   0x00000a    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA1   0x00000d    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA2   0x000010    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA3   0x000013    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA4   0x000016    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA5   0x000019    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA6   0x00001c    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+                   ETAPA7   0x00001f    program     static C:\Users\vitor\MPLABXProjects\4 luzes.X\newpic_8b_simple.asm
+
+
