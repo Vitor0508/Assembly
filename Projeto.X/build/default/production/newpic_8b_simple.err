@@ -1,0 +1,7 @@
+Warning[205] C:\USERS\IFTM\MPLABXPROJECTS\PROJETO.X\NEWPIC_8B_SIMPLE.ASM 8 : Found directive in column 1. (__CONFIG)
+Message[302] C:\USERS\IFTM\MPLABXPROJECTS\PROJETO.X\NEWPIC_8B_SIMPLE.ASM 13 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\IFTM\MPLABXPROJECTS\PROJETO.X\NEWPIC_8B_SIMPLE.ASM 14 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\IFTM\MPLABXPROJECTS\PROJETO.X\NEWPIC_8B_SIMPLE.ASM 15 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\IFTM\MPLABXPROJECTS\PROJETO.X\NEWPIC_8B_SIMPLE.ASM 16 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\IFTM\MPLABXPROJECTS\PROJETO.X\NEWPIC_8B_SIMPLE.ASM 17 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Warning[205] C:\USERS\IFTM\MPLABXPROJECTS\PROJETO.X\NEWPIC_8B_SIMPLE.ASM 76 : Found directive in column 1. (END)
