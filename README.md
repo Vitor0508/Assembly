@@ -38,6 +38,14 @@ Funcionamento:
 - ao energizar, nenhum acionamento do motor deve estar ativo, somente a indicação de motor desligado.
 - com o motor não acionado, o motor pode ser acionado em qualquer sentido, horário ou anti-horário, as respectivas indicações devem ser ativas simultaneamente quando o motor for acionado.
 
+
+04 - Contador de 0 a 9 - progressivo/regressivo 
+
+Modificar o programa contador de 0 a 9, para interface McLab1, para realizar as seguintes tarefas:
+- o botão RA1 reinicializa a sequência, ou seja, volta a indicar "zero" no display;
+- o botão RA2, contagem progressiva, a cada acionamento do botão;
+- o botão RA3, contagem regressiva, a cada acionamento do botão;
+- o botão RA1 tem prioridade sobre os outros, ou seja, se ele estiver pressionado o contador não conta para cima nem para baixo.
 - uma vez ativo em uma direção, horário ou anti-horário, não poderá ter a direção alterada enquanto em funcionamento, para que possa inverter o sentido é necessário, primeiro, desligar o motor.
 
 - quando um acionamento de emergência, RA4, for ativado, o motor deve ser desligado, caso esteja em funcionamento, e o religamento bloqueado até que o botão DESLIGA seja acionado. O acionamento do botão DESLIGA permite reconhecer que houve uma emergência e permite que o motor seja novamente religado.
