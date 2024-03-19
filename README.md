@@ -49,3 +49,22 @@ Modificar o programa contador de 0 a 9, para interface McLab1, para realizar as 
 - uma vez ativo em uma direção, horário ou anti-horário, não poderá ter a direção alterada enquanto em funcionamento, para que possa inverter o sentido é necessário, primeiro, desligar o motor.
 
 - quando um acionamento de emergência, RA4, for ativado, o motor deve ser desligado, caso esteja em funcionamento, e o religamento bloqueado até que o botão DESLIGA seja acionado. O acionamento do botão DESLIGA permite reconhecer que houve uma emergência e permite que o motor seja novamente religado.
+
+05 - Pisca pisca duplo
+
+Montar um programa em Assembly que acione um pisca pisca na saída RA0. Use o módulo McLab1.
+
+Ao iniciar o sistema, a saída RA0 deve estar apagada.
+
+Para acionar o pisca um dos botões devem ser acionado, RA1 ou RA2.
+
+O botão RA3 desliga os pisca-piscas.
+
+Somente pode ser acionado qualquer um dos piscas se estiver parado, isto é, se for acionado o pisca com frequência de 2HZ e desejar acionar o de 5Hz, é necessário desligar o pisca através do botão RA3 antes de acionar o botão da outra frequência.
+
+As frequências são:
+RA1 => 2Hz
+
+RA2 => 5Hz
+
+Clock: 4MHz
