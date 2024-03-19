@@ -1,0 +1,54 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Tue Mar 19 17:27:14 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000070
+                   .cinit    romdata   0x000038    program   0x000004
+.config_2007_BUILD/DEFAULT/PRODUCTION/NEWPIC_       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000039      
+                            0x002007    0x002007      
+            59 out of 2182 program addresses used, program memory utilization is 2%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          CARREGA_DELAY_2   0x00001e    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+          CARREGA_DELAY_4   0x00002c    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+       DECREMENTA_DELAY_2   0x000020    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+       DECREMENTA_DELAY_4   0x00002e    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+              DELAY_200MS   0x00002a    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+              DELAY_500MS   0x00001c    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                     FOI1   0x000006    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                     FOI2   0x00000a    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                     FOI3   0x000003    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                    LOOP1   0x00000e    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                    LOOP2   0x000015    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+                     FOI3   0x000003    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                     FOI1   0x000006    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                     FOI2   0x00000a    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                    LOOP1   0x00000e    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+                    LOOP2   0x000015    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+              DELAY_500MS   0x00001c    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+          CARREGA_DELAY_2   0x00001e    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+       DECREMENTA_DELAY_2   0x000020    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+              DELAY_200MS   0x00002a    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+          CARREGA_DELAY_4   0x00002c    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+       DECREMENTA_DELAY_4   0x00002e    program     static C:\Users\vitor\MPLABXProjects\Pisca pisca duplo .X\newpic_8b_simple.asm
+
+
