@@ -65,6 +65,21 @@ Somente pode ser acionado qualquer um dos piscas se estiver parado, isto é, se 
 As frequências são:
 RA1 => 2Hz
 
+06 - Contador 00a99
+
+Montar um programa em Assembly, baseado no módulo McLab1, que execute a contagem de 00 a 99, de  forma crescente e decrescente. O contador deve iniciar em “00” ao ser ligado e os comandos  devem ser dados pelos seguintes botões:
+
+o botão RA1 faz com que a contagem crescente seja iniciada, o incremento deve ser automático com intervalo de 1s;
+o botão RA2, faz com que a contagem decrescente seja iniciada, o decremento deve ser automático com intervalo de 1s;
+o botão RA3, para o contador e tem prioridade sobre os outros, isto é, se estiver pressionado, os botões RA1 e RA2 não acionam a contagem;
+o botão RA4, zera o contador e tem prioridade sobre os outros, isto é, se estiver pressionado, os botões RA1 e RA2 não acionam a contagem;
+a mudança de sequência crescente para decrescente só pode ser feita se o contador estiver parado;
+o tempo de varredura dos displays multiplexados deve ser de 8ms, ou seja, cada display deve ficar aceso por 4ms.
+Obs: quando o contador chegar a 99 ele retorna a 00 caso a contagem seja crescente e, quando chegar a 00, ele retorna a 99 se a contagem for decrescente.
+
+Bom programa.
+Clock: 4MHz
+
 RA2 => 5Hz
 
 Clock: 4MHz
