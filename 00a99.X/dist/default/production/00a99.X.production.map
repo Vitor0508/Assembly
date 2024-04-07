@@ -1,0 +1,68 @@
+MPLINK 5.08, LINKER
+Linker Map File - Created Sun Apr 07 14:22:25 2024
+
+                                 Section Info
+                  Section       Type    Address   Location Size(Bytes)
+                ---------  ---------  ---------  ---------  ---------
+                 RES_VECT       code   0x000000    program   0x000002
+                   .cinit    romdata   0x000001    program   0x000004
+                      ISR       code   0x000004    program   0x000126
+.config_2007_BUILD/DEFAULT/PRODUCTION/NEWPIC_       code   0x002007    program   0x000002
+
+
+
+                              Program Memory Usage 
+                               Start         End      
+                           ---------   ---------      
+                            0x000000    0x000002      
+                            0x000004    0x000096      
+                            0x002007    0x002007      
+            151 out of 2182 program addresses used, program memory utilization is 6%
+
+
+
+                              Symbols - Sorted by Name
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+            ACENDE_DEZENA   0x000083    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+               ACENDE_LED   0x00007e    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+           ACENDE_UNIDADE   0x000088    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+             BUSCA_CODIGO   0x00008c    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+              B_DEC_PRESS   0x000067    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+          B_INICIAR_PRESS   0x000070    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+            B_PARAR_PRESS   0x00005a    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                   INICIO   0x00001b    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+           LACO_PRINCIPAL   0x000026    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+       LACO_PRINCIPAL_DEC   0x00003d    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                   PARADO   0x00005d    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                   RESETA   0x000064    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+          SAI_INTERRUPCAO   0x000017    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+            TROCA_DISPLAY   0x000080    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                TROCA_LED   0x000079    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                      _9D   0x000057    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                      _9U   0x000054    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+
+
+
+                              Symbols - Sorted by Address
+                     Name    Address   Location    Storage File                     
+                ---------  ---------  ---------  --------- ---------                
+          SAI_INTERRUPCAO   0x000017    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                   INICIO   0x00001b    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+           LACO_PRINCIPAL   0x000026    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+       LACO_PRINCIPAL_DEC   0x00003d    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                      _9U   0x000054    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                      _9D   0x000057    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+            B_PARAR_PRESS   0x00005a    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                   PARADO   0x00005d    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                   RESETA   0x000064    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+              B_DEC_PRESS   0x000067    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+          B_INICIAR_PRESS   0x000070    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+                TROCA_LED   0x000079    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+               ACENDE_LED   0x00007e    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+            TROCA_DISPLAY   0x000080    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+            ACENDE_DEZENA   0x000083    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+           ACENDE_UNIDADE   0x000088    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+             BUSCA_CODIGO   0x00008c    program     static C:\Users\vitor\MPLABXProjects\00a99.X\newpic_8b_simple.asm
+
+

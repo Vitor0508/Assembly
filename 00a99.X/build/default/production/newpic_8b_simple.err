@@ -1,0 +1,4 @@
+Message[301] E:\ARQUIVOS DE PROGRAMAS\MPLAB\MPASMX\P16F628A.INC 34 : MESSAGE: (Processor-header file mismatch.  Verify selected processor.)
+Message[302] C:\USERS\VITOR\MPLABXPROJECTS\00A99.X\NEWPIC_8B_SIMPLE.ASM 77 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\VITOR\MPLABXPROJECTS\00A99.X\NEWPIC_8B_SIMPLE.ASM 78 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Message[302] C:\USERS\VITOR\MPLABXPROJECTS\00A99.X\NEWPIC_8B_SIMPLE.ASM 80 : Register in operand not in bank 0.  Ensure that bank bits are correct.
