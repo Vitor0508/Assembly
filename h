@@ -1,0 +1,314 @@
+; PIC16F628A Configuration Bit Settings
+; Assembly source line config statements
+#include "p16f628a.inc"
+; CONFIG
+; __config 0xFF70
+ __CONFIG _FOSC_INTOSCIO & _WDTE_OFF & _PWRTE_ON & _MCLRE_ON & _BOREN_ON & _LVP_OFF & _CPD_OFF & _CP_OFF
+;nomeando posi��o da mem�ria RAM
+ CBLOCK	0x20
+    FLAGS	;0x20
+    FILTRO	;0x21
+    UNIDADE	;0x22
+    DELAY_1	
+    DELAY_2	
+    DELAY_3
+    DELAY_4
+    DELAY_5
+    DELAY_6
+    W_TEMP	
+    STATUS_TEMP	
+    CONTADOR
+    CONTADOR2	
+ ENDC
+ 
+;entradas
+#define	    BOTAO2   PORTA,2
+#define	    BOTAO3   PORTA,3
+#define	    BOTAO1   PORTA,1
+#define	    BOTAO4   PORTA,4
+#define	    LED	     PORTA,0
+#define    INT_ATIVA	    FLAGS,1
+#define    V_TROCA_LED	    FLAGS,2
+#define    CONTANDO	    FLAGS,3
+#define    FIM_LED	    FLAGS,4 
+;sa�das
+#define	    NUMERO  PORTB
+
+;vari�veis
+#define    JA_LI   FLAGS,0
+ 
+;constantes 
+V_FILTRO    equ	    .100
+V_TMR0	    equ	    .6
+V_CONT	    equ	    .125    
+V_CONT2	    equ	    .2
+
+V_DELAY_1   equ	    .132
+V_DELAY_2   equ	    .250
+V_DELAY_3   equ	    .195
+V_DELAY_4   equ	    .127
+V_DELAY_5   equ	    .255
+V_DELAY_6   equ	    .255
+;=== programa ==============
+RES_VECT  CODE    0x0000    ;vetor de reset, indica a posi��o inicial do programa na FLASH
+    GOTO    INICIO
+ISR	    CODE    0x0004	; interrupt vector location
+    MOVWF   W_TEMP		;salva o conteúdo de W em W_TEMP	    
+    MOVF    STATUS,W		;W = STATUS
+    MOVWF   STATUS_TEMP		;salva o conteúdo de STATUS em STATUS_TEMP
+    BTFSS   INTCON,T0IF		;testa se o indicador de interrupção por TMR0 está ativo
+    GOTO    SAI_INTERRUPCAO	;se não estiver, pula para SAI_INTERRUPCAO
+    BCF	    INTCON,T0IF		;zera o flag indicador de interrupção por TMR0
+    MOVLW   V_TMR0		;W = V_TMR0`
+    ADDWF   TMR0,F		;TMR0 = TMR0 + V_TMR0`
+    DECFSZ  CONTADOR,F		;decrementa CONTADAOR e testa se é zero`
+    GOTO    SAI_INTERRUPCAO	;se não for zero, pula para SAI_INTERRUPCAO`
+    
+    MOVLW   V_CONT		;W = V_CONT`
+    MOVWF   CONTADOR		;CONTADOR = V_CONT`
+    
+    
+SAI_INTERRUPCAO
+    MOVF    STATUS_TEMP,W	;W = STATUS_TEMP
+    MOVWF   STATUS		;restaura o conteúdo de STATUS
+    MOVF    W_TEMP,W		;restaura o conteúdo de W    	
+    RETFIE    
+    
+INICIO
+    BSF	    STATUS,RP0	    ;seleciona o banco 1 da mem�ria RAM
+    MOVLW   B'00000000'	    ;W =  B'11110000' (240)
+    MOVWF   TRISB	    ;TRISB = B'11110000' (240)  
+    BCF	    TRISA,0	    ; CONFIGURA O PINO A0 COMO SAIDA
+    MOVLW   B'11010011'	    ;palavra de configuração do TMR0
+    MOVWF   OPTION_REG	    ;carrega a palavra de configuração do TMR0 no OPTION_REG
+    BCF	    STATUS,RP0	    ;seleciona o banco 0 da mem�ria RAM
+    CLRF    UNIDADE	    ;UNIDADE = 0
+    MOVF    UNIDADE,W	    ;W = UNIDADE
+    BSF	    INTCON,T0IE	    ;permite atender interrupção por TMR0    
+    BSF	    INTCON,GIE	    ;permite atender interrupções 
+    CALL    ESCREVE_DISPLAY ;chama a subrotina para escrever no display
+
+ZERA_JA_LI    
+    BCF	    JA_LI	    ;zera a vari�vel JA_LI
+    MOVLW   V_FILTRO	    ;W = V_FILTRO
+    MOVWF   FILTRO	    ;FILTRO = V_FILTRO
+    
+FOI1
+    BTFSC   BOTAO1	    ;l� e testa o bit 1 do PORTA
+    GOTO    FOI2
+    CALL    LE_BOTAO1
+    
+FOI2
+    BTFSC   BOTAO2	    ;l� e testa o bit 1 do PORTA
+    GOTO    FOI3
+    CALL    DESLIGA
+    
+FOI3
+    BTFSC   BOTAO3	    ;l� e testa o bit 1 do PORTA
+    GOTO    FOI4
+    CALL    LE_BOTAO3
+    
+
+FOI4
+    BTFSC   BOTAO4	    ;l� e testa o bit 1 do PORTA
+    GOTO    FOI1
+    CALL    LE_BOTAO4
+    
+LE_BOTAO1
+    BTFSS   BOTAO2	    ;l� e testa o bit 1 do PORTA`
+    GOTO    FOI2
+    MOVF    UNIDADE,W	    ;W = UNIDADE`
+    ADDWF   PCL,F
+    CALL    LOOP0
+    CALL    LOOP1
+    CALL    LOOP2
+    CALL    LOOP3
+    CALL    LOOP4
+    CALL    LOOP5
+    CALL    LOOP6
+    CALL    LOOP7
+    CALL    LOOP8
+    CALL    LOOP9
+    RETURN
+    
+LE_BOTAO3
+    BTFSC   BOTAO3	    ;l� e testa o bit 1 do PORTA
+    GOTO    ZERA_JA_LI	    ;se "1" pula para ZERA_JA_LI
+    BTFSC   JA_LI	    ;testa o JA_LI
+    GOTO    LE_BOTAO3	    ;se "1", pula para LE_BOTAO   
+    DECFSZ  FILTRO,F	    ;decrementa FILTRO e testa se � igual a 0
+    GOTO    LE_BOTAO3	    ;se n�o for zero, pula para LE_BOTAO
+    BSF	    JA_LI	    ;JA_LI = 1       
+    INCF    UNIDADE,F	    ; UNIDADE++
+    MOVLW   .10		    ;W = 10 (B'00001010' ou 0x0A)
+    SUBWF   UNIDADE,W	    ;W = UNIDADE - W
+    BTFSC   STATUS,C	    ;testa se o resultado � negativo
+    CLRF    UNIDADE	    ;UNIDADE = 0
+    MOVF    UNIDADE,W	    ;W = UNIDADE
+    CALL    ESCREVE_DISPLAY ;chama a subrotina para escrever no display
+    GOTO    LE_BOTAO3	    ;pula para LE_BOTAO
+    RETURN
+    
+LE_BOTAO4
+    BTFSC   BOTAO4	    ;l� e testa o bit 1 do PORTA
+    GOTO    ZERA_JA_LI	    ;se "1" pula para ZERA_JA_LI
+    BTFSC   JA_LI	    ;testa o JA_LI
+    GOTO    LE_BOTAO4	    ;se "1", pula para LE_BOTAO   
+    DECFSZ  FILTRO,F	    ;decrementa FILTRO e testa se � igual a 0
+    GOTO    LE_BOTAO4	    ;se n�o for zero, pula para LE_BOTAO
+    BSF	    JA_LI	    ;JA_LI = 1       
+    DECF    UNIDADE,F	    ; UNIDADE--
+    MOVLW   .10		    ;W = 10 (B'00001010' ou 0x0A)
+    SUBWF   UNIDADE,W	    ;W = UNIDADE - W
+    BTFSC   STATUS,C	    ;testa se o resultado � negativo
+    CALL    _9
+    MOVF    UNIDADE,W	    ;W = UNIDADE
+    CALL    ESCREVE_DISPLAY ;chama a subrotina para escrever no display
+    GOTO    LE_BOTAO4	    ;pula para LE_BOTAO
+_9
+    MOVLW   .9
+    MOVWF    UNIDADE
+    RETURN
+ESCREVE_DISPLAY
+    CALL    BUSCA_CODIGO    ;chama a subrotina para buscar o c�digo de 7 segmentos
+    MOVWF   NUMERO	    ;NUMERO = w (c�digo de 7 segmentos)
+    RETURN		    ;retorna da chamada de subrotina
+BUSCA_CODIGO
+    ADDWF   PCL,F	    
+    RETLW   .254    
+    RETLW   .56
+    RETLW   .221
+    RETLW   .125
+    RETLW   .59
+    RETLW   .119
+    RETLW   .247
+    RETLW   .60
+    RETLW   .255
+    RETLW   .127
+    
+DESLIGA
+    BCF	    LED
+    RETURN
+    
+DELAY_200MS
+    MOVLW   V_DELAY_1		;W = V_DELAY_1				(1)
+    MOVWF   DELAY_1		;DELAY_1 = V_DELAY_1			(1)
+CARREGA_DELAY_2
+    MOVLW   V_DELAY_2		;W = V_DELAY_2				(1)
+    MOVWF   DELAY_2		;DELAY_2 = V_DELAY_2			(1)
+DECREMENTA_DELAY_2 
+    NOP
+    NOP
+    NOP
+    DECFSZ  DELAY_2,F		;decrementa e testa se DELAY_2 zerou	(1/2)
+    GOTO    DECREMENTA_DELAY_2	;se n�o zerou, decrementa de novo	(2)
+    DECFSZ  DELAY_1,F		;decrementa e testa se DELAY_1 zerou	(1/2)
+    GOTO    CARREGA_DELAY_2	;se n�o zerou, repete tudo		(2)
+    RETURN			;					(2)
+    
+DELAY_500MS
+    MOVLW   V_DELAY_3		;W = V_DELAY_1				(1)
+    MOVWF   DELAY_3		;DELAY_1 = V_DELAY_1			(1)
+CARREGA_DELAY_4
+    MOVLW   V_DELAY_4		;W = V_DELAY_2				(1)
+    MOVWF   DELAY_4		;DELAY_2 = V_DELAY_2			(1)
+DECREMENTA_DELAY_4 
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    NOP
+    DECFSZ  DELAY_4,F		;decrementa e testa se DELAY_2 zerou	(1/2)
+    GOTO    DECREMENTA_DELAY_4	;se n�o zerou, decrementa de novo	(2)
+    DECFSZ  DELAY_3,F		;decrementa e testa se DELAY_1 zerou	(1/2)
+    GOTO    CARREGA_DELAY_4	;se n�o zerou, repete tudo		(2)
+    RETURN			;					(2)
+    
+DELAY_1200MS
+    MOVLW   V_DELAY_5		;W = V_DELAY_1				(1)
+    MOVWF   DELAY_5		;DELAY_1 = V_DELAY_1			(1)
+CARREGA_DELAY_6
+    MOVLW   V_DELAY_6		;W = V_DELAY_2				(1)
+    MOVWF   DELAY_6		;DELAY_2 = V_DELAY_2			(1)
+DECREMENTA_DELAY_6
+    
+    DECFSZ  DELAY_6,F		;decrementa e testa se DELAY_2 zerou	(1/2)
+    GOTO    DECREMENTA_DELAY_6	;se n�o zerou, decrementa de novo	(2)
+    DECFSZ  DELAY_5,F		;decrementa e testa se DELAY_1 zerou	(1/2)
+    GOTO    CARREGA_DELAY_6	;se n�o zerou, repete tudo		(2)
+    RETURN
+
+LOOP0
+    BTFSS   BOTAO2	    ;l� e testa o bit 1 do PORTA
+    GOTO    FOI2
+    BSF	    LED		    ;liga a l�mpada conectada no pino 0 do PORTA
+    CALL    DELAY_200MS	    ;chama a subrotina de delay
+    BCF	    LED		    ;apaga a l�mpada conectada no pino 0 do PORTA
+    CALL    DELAY_200MS	    ;chama a subrotina de delay
+    GOTO    LOOP0
+    RETURN
+LOOP1
+    BTFSS   BOTAO2	    ;l� e testa o bit 1 do PORTA
+    GOTO    FOI2
+    BSF	    LED		    ;liga a l�mpada conectada no pino 0 do PORTA
+    CALL    DELAY_1200MS	    ;chama a subrotina de delay
+    BCF	    LED		    ;apaga a l�mpada conectada no pino 0 do PORTA
+    CALL    DELAY_1200MS	    ;chama a subrotina de delay
+    GOTO    LOOP1
+    RETURN
+    
+LOOP2
+    BTFSS   BOTAO2	    ;l� e testa o bit 1 do PORTA
+    GOTO    FOI2
+    BSF	    LED		    ;liga a l�mpada conectada no pino 0 do PORTA
+    CALL    DELAY_500MS	    ;chama a subrotina de delay
+    BCF	    LED		    ;apaga a l�mpada conectada no pino 0 do PORTA
+    CALL    DELAY_500MS	    ;chama a subrotina de delay
+    GOTO    LOOP2
+    RETURN
+    
+LOOP3
+    RETURN
+LOOP4
+    RETURN
+LOOP5
+    RETURN
+LOOP6
+    RETURN
+LOOP7
+    RETURN
+LOOP8
+    RETURN
+LOOP9
+    RETURN
+    
+BUSCA_P
+    ADDWF   PCL,F	    
+    RETLW   B'00000000'    
+    RETLW   B'00000000'
+    RETLW   B'00000001'
+    RETLW   B'00000001'
+    RETLW   B'00000011'
+    RETLW   B'00000011'
+    RETLW   B'00000000'
+    RETLW   B'00000000'
+    RETLW   B'00000000'
+    RETLW   B'00000000'
+    
+TROCA_LED
+    BTFSS   LED	    ;testa se a l mpada acesa
+    GOTO    ACENDE_LED  ;se l mpada apagada, pule para ACENDE_LAMPADA	
+    GOTO    APAGA_LED	    ;apaga a l mpada
+    RETURN
+ACENDE_LED
+    BSF	    LED
+    RETURN
+APAGA_LED
+    BCF	    LED
+    RETURN
+    END
