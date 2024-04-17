@@ -1,240 +1,228 @@
-; PIC16F877A Configuration Bit Settings
-; Assembly source line config statements
-#include "p16f877a.inc"
+;PROVA - 1 MICRO
+;RAFAEL JARDIM CARONI
+#include "p16f628a.inc"
 ; CONFIG
-; __config 0xFF71
- __CONFIG _FOSC_XT & _WDTE_OFF & _PWRTE_ON & _BOREN_ON & _LVP_OFF & _CPD_OFF & _WRT_OFF & _CP_OFF
+; __config 0xFF70
+ __CONFIG _FOSC_INTOSCIO & _WDTE_OFF & _PWRTE_ON & _MCLRE_ON & _BOREN_ON & _LVP_OFF & _CPD_OFF & _CP_OFF
+;=======================================================
+#define	BANK0	BCF STATUS,RP0
+#define	BANK1	BSF STATUS,RP0
+;=======================================================
+;nomear posi  es da mem ria RAM
+    CBLOCK  0X20    ;bloco de mem ria
+	FLAGS	    ;0x20
+	AUX_CONT    ;0x21
+	S_TEMP	    ;0x22
+	W_TEMP	    ;0x23	
+	UNIDADE	    ;0x24
+	FILTRO_INC  ;0x25
+	FILTRO_DEC  ;0x26
+    ENDC	    ;fim de bloco de mem ria
+;======================================================= 
+;vari veis boolenas
+#define	PISCANDO    FLAGS,0
+#define	FIM_TEMPO   FLAGS,1
+#define	JA_LI_UP    FLAGS,2
+#define	JA_LI_DOWN  FLAGS,3
 
-#define BANK0	BCF STATUS,RP0
-#define BANK1	BSF STATUS,RP0
- 
-;nomeando posição da memória RAM 
- CBLOCK	0x20
-    FLAGS	;0x20
-    CONTADOR2	;0x21
-    UNIDADE	;0x22
-    DEZENA	;0x23
-    CENTENA
-    MILHAR
-    W_TEMP	;0x24
-    STATUS_TEMP	;0x25
-    CONTADOR	;0x26
- ENDC
- 
+;=======================================================    
 ;entradas
-#define	    B_INICIAR	    PORTB,0
-#define	    B_PARAR	    PORTB,1
-#define	    B_ZERAR	    PORTB,2
- 
-;saídas
-#define	    DISPLAYS	    PORTD
-#define	    D_UNIDADE	    PORTB,4
-#define	    D_DEZENA	    PORTB,5
-#define	    D_CENTENA	    PORTB,6
-#define	    D_MILHAR	    PORTB,7
- 
-;variáveis
-#define    JA_LI	    FLAGS,0
-#define    INT_ATIVA	    FLAGS,1
-#define    FIM_TEMPO	    FLAGS,2
-#define    CONTANDO	    FLAGS,3
-#define    FIM_LED	    FLAGS,4 
-
-;constantes 
-V_TMR0	    equ	    .6
+#define B_LIGA	    PORTA,1
+#define B_DESLIGA   PORTA,2    
+#define B_FREQ_UP   PORTA,3    
+#define B_FREQ_DOWN PORTA,4
+;=======================================================
+;sa das
+#define LAMPADA	    PORTA,0    
+#define DISPLAY	    PORTB
+;=======================================================
+;constantes
+V_TMR0	    equ	    .131	;256 - 131 = 125 PULSOS
+V_TEMPO	    equ	    .250
 V_FILTRO    equ	    .100
-V_CONT	    equ	    .125    
-V_CONT2	    equ	    .2
-;=== programa ==============
-RES_VECT    CODE    0x0000    ;vetor de reset, indica a posição inicial do programa na FLASH
-    GOTO    INICIO
+;=======================================================
+RES_VECT  CODE    0x0000        ;processor reset vector
+    GOTO    START               ;go to beginning of program
+;=======================================================
+;USANDO O PRESCALER DE 08 B'XXXXX010' COM MULTIPLOS PARA AS FREQUENCIAS PEDIDAS
+;SENDO ELAS:
+;	2Hz -- 500Ms/2 -- 250	AUX
+;	4Hz -- 250Ms/2 -- 125	AUX
+;	5Hz -- 200Ms/2 -- 100	AUX
+;	6.67Hz -- 150Ms/2 -- 75	AUX
+;	8.33Hz -- 120Ms/2 -- 60	AUX
+;	10Hz -- 100Ms/2 -- 50	AUX
+;	12.5Hz -- 80Ms/2 -- 40	AUX
+;	16.67Hz -- 60Ms/2 -- 30	AUX
+;	20Hz -- 50Ms/2 -- 25	AUX
+;	25Hz -- 40Ms/2 -- 20	AUX
 
-ISR	    CODE    0x0004	; interrupt vector location
-    MOVWF   W_TEMP		;salva o conteúdo de W em W_TEMP	    
-    MOVF    STATUS,W		;W = STATUS
-    MOVWF   STATUS_TEMP		;salva o conteúdo de STATUS em STATUS_TEMP
-    BTFSS   INTCON,T0IF		;testa se o indicador de interrupção por TMR0 está ativo
-    GOTO    SAI_INTERRUPCAO	;se não estiver, pula para SAI_INTERRUPCAO
-    BCF	    INTCON,T0IF		;zera o flag indicador de interrupção por TMR0
-    MOVLW   V_TMR0		;W = V_TMR0
-    ADDWF   TMR0,F		;TMR0 = TMR0 + V_TMR0
-    BSF	    INT_ATIVA		;INT_ATIVA = 1
-    DECFSZ  CONTADOR,F		;decrementa CONTADAOR e testa se é zero
-    GOTO    SAI_INTERRUPCAO	;se não for zero, pula para SAI_INTERRUPCAO
-    MOVLW   V_CONT		;W = V_CONT
-    MOVWF   CONTADOR		;CONTADOR = V_CONT
-    BSF	    FIM_LED		;FIM_LED
-    DECFSZ  CONTADOR2,F		;decrementa CONTADOR2 e testa se é zero
-    GOTO    SAI_INTERRUPCAO	;se não for zero, pula para SAI_INTERRUPCAO
-    BSF	    FIM_TEMPO		;FIM_TEMPO = 1
-    MOVLW   V_CONT2		;W = V_CONT2
-    MOVWF   CONTADOR2		;CONTADOR2 = V_CONT2    
+;=======================================================
+;rotina de interru  o
+ISR       CODE    0x0004	; interrupt vector location
+    MOVWF   W_TEMP		;salva o conte do de W em W_TEMP
+    MOVF    STATUS,W		;carrega o conte do de STATUS em W
+    MOVWF   S_TEMP		;salva o conte do de STATUS em S_TEMP
+    BTFSS   INTCON,T0IF		;testa se a interrup  o   por TMR0
+    GOTO    SAI_INTERRUPCAO	;se n o   por TMR0, pule para SAI_INTERRUPCAO
+    BCF	    INTCON,T0IF		;limpa o bit indicador de interrup  o por TMR0
+    MOVLW   V_TMR0		;carrega 6 em W
+    ADDWF   TMR0,F		;soma 6 ao conte do do TMR0
+    DECFSZ  AUX_CONT,F		;decrementa AUX_CONT e testa se   0
+    GOTO    SAI_INTERRUPCAO	;se for 0, pule para SAI_INTERRUPCAO
+    BSF	    FIM_TEMPO		;seta indicador de fim de tempo
+;    MOVLW   V_TEMPO		;carrega o valor inicial do contador auxiliar em W
+;    MOVWF   AUX_CONT		;carrega o valor no contador auxiliar - AUX_CONT
+    CALL    MUDA_FREQ
 SAI_INTERRUPCAO
-    MOVF    STATUS_TEMP,W	;W = STATUS_TEMP
-    MOVWF   STATUS		;restaura o conteúdo de STATUS
-    MOVF    W_TEMP,W		;restaura o conteúdo de W    	
+    MOVF    S_TEMP,W		;carrega o conte do de S_TEMP em W 
+    MOVWF   STATUS		;salva o conte do de W em STATUS
+    MOVF    W_TEMP,W		;salva o conte do de W_TEMP em W    
     RETFIE
-    
-BUSCA_CODIGO
-    ADDWF   PCL,F	    
-    RETLW   B'00111111'	    ;63   
-    RETLW   B'00000110'	    ;6
-    RETLW   B'01011011'	    ;91
-    RETLW   B'01001111'	    ;79
-    RETLW   B'01100110'	    ;102
-    RETLW   B'01101101'	    ;109
-    RETLW   B'01111101'	    ;125
-    RETLW   B'00000111'	    ;7
-    RETLW   B'01111111'	    ;127
-    RETLW   B'01101111'	    ;111
-    
-BUSCA_CODIGO2
-    ADDWF   PCL,F	    
-    RETLW   B'10111111'	    ;63   
-    RETLW   B'10000110'	    ;6
-    RETLW   B'11011011'	    ;91
-    RETLW   B'11001111'	    ;79
-    RETLW   B'11100110'	    ;102
-    RETLW   B'11101101'	    ;109
-    RETLW   B'11111101'	    ;125
-    RETLW   B'10000111'	    ;7
-    RETLW   B'11111111'	    ;127
-    RETLW   B'11101111'	    ;111
-    
-INICIO  
-    BANK1		    ;seleciona o banco 1 da memória RAM
-    MOVLW   B'00001111'	    ;W = 00001111
-    MOVWF   TRISB	    ;TRISB = 00001111,configura os 4LSB como entrada e os 4MSB como saída
-    CLRF    TRISD	    ;TRISD = 00000000,configura o PORTD como saída
-    MOVLW   B'11010011'	    ;palavra de configuração do TMR0
-    MOVWF   OPTION_REG	    ;carrega a palavra de configuração do TMR0 no OPTION_REG
-    BANK0		    ;seleciona o banco 0 da memória RAM
-    CLRF    UNIDADE	    ;UNIDADE = 0
-    CLRF    DEZENA  	    ;DEZENA = 0
-    CLRF    CENTENA
-    CLRF    MILHAR
-    BCF	    D_UNIDADE	    ;apaga o display da UNIDADE
-    BCF	    D_DEZENA	    ;apaga o display da DEZENA
-    BCF	    D_CENTENA	    ;apaga o display da CENTENA
-    BCF	    D_MILHAR	    ;apaga o display da MILHAR     
-    BSF	    INTCON,T0IE	    ;permite atender interrupção por TMR0    
-    BSF	    INTCON,GIE	    ;permite atender interrupções  
+;fim da rotina de interru  o
+;=======================================================
+;c digo principal
+START
+    BANK1		    ;seleciona o banco 1 da mem ria RAM
+    BCF	    TRISA,0	    ;configura o bit 0 do PORTA como sa da
+    CLRF    TRISB
+    MOVLW   B'11010010'	    ;define a palavra de configura  o do TIMER0
+			    ;bit 7 - RBPU:1 - desabilita os registros do PORTB
+			    ;bit 6 - INTEDG:1 - define a borda da interrup  o por borda
+			    ;bit 5 - T0CS:0 - define clock interno para TMR0
+			    ;bit 4 - T0SE:1 - define borda do clock TMR0, quando externo
+			    ;bit 3 - PSA:0 - associa o prescaler ao TMR0
+			    ;bit 2..0 - PS<2..0>:011 - define prescaler em 1:16
+    MOVWF   OPTION_REG	    ;carrega a configura  o no OPTION_REG
+    BANK0		    ;seleciona o banco 0 da mem ria RAM    
+    BCF	    LAMPADA	    ;apaga a l mpada
+    BCF	    PISCANDO	    ;limpa a booleana PISCANDO
+    BCF	    FIM_TEMPO	    ;limpa a booleana FIM_TEMPO
+    BCF	    JA_LI_UP
+    BCF	    JA_LI_DOWN
+    MOVLW   V_FILTRO
+    MOVWF   FILTRO_INC
+    MOVWF   FILTRO_DEC
+    CLRF    UNIDADE
+    CALL    ESCREVE_DISPLAY
+    BSF	    INTCON,T0IE	    ;habilita o atendimento da interrup  o por TIMER0
+    BSF	    INTCON,GIE	    ;habilita o atendimento das interrup  es    
 LACO_PRINCIPAL
-    BTFSC   INT_ATIVA	    ;testa se o bit indicador de tempo 4ms está ativo
-    CALL    TROCA_DISPLAY   ;se INT_ATIVA = 1, chama sub-rotina TROCA_DISPLAY
-    BTFSS   CONTANDO	    ;testa se CONTANDO = 1
-    GOTO    PARADO	    ;se não, pule para PARADO     
-    BTFSS   B_PARAR	    ;testa se o botão B_PARAR está liberado	
-    GOTO    B_PARAR_PRESS   ;se pressionado pule para B_PARAR_PRESS
-    BTFSC   FIM_LED	    ;testa se o FIM_LED = 0
-    CALL    TROCA_LED	    ;se FIM_LED = 1, chama a rotina de troca de estado do LED 
-    BTFSS   FIM_TEMPO	    ;testa se o FIM_TEMPO = 1
-    GOTO    LACO_PRINCIPAL  ;se FIM_TEMPO = 0, pula para  LACO_PRINCIPAL
-    BCF	    FIM_TEMPO	    ;FIM_TEMPO = 0
-    INCF    UNIDADE,F	    ;UNIDADE++
-    MOVLW   .10		    ;W = 10 (B'00001010' ou 0x0A)
-    SUBWF   UNIDADE,W	    ;W = UNIDADE - W
-    BTFSS   STATUS,C	    ;testa se o resultado é positivo
-    GOTO    LACO_PRINCIPAL  ;se resutado for negativo, pula para LACO_PRINCIPAL
-    CLRF    UNIDADE	    ;UNIDADE = 0
-    INCF    DEZENA,F	    ;DEZENA++
-    MOVLW   .10		    ;W = 10 (B'00001010' ou 0x0A)
-    SUBWF   DEZENA,W	    ;W = DEZENA - W
-    BTFSC   STATUS,C	    ;testa se o resultado é negativo
-    CLRF    DEZENA	    ;DEZENA = 0
-    INCF    CENTENA,F	    ;UNIDADE++
-    MOVLW   .10		    ;W = 10 (B'00001010' ou 0x0A)
-    SUBWF   CENTENA,W	    ;W = UNIDADE - W
-    BTFSS   STATUS,C	    ;testa se o resultado é positivo
-    GOTO    LACO_PRINCIPAL  ;se resutado for negativo, pula para LACO_PRINCIPAL
-    CLRF    CENTENA	    ;UNIDADE = 0
-    INCF    MILHAR,F	    ;DEZENA++
-    MOVLW   .10		    ;W = 10 (B'00001010' ou 0x0A)
-    SUBWF   MILHAR,W	    ;W = DEZENA - W
-    BTFSC   STATUS,C	    ;testa se o resultado é negativo
-    CLRF    MILHAR	    ;DEZENA = 0
-    GOTO    LACO_PRINCIPAL  ;pula para LACO_PRINCIPAL  
-  
-B_PARAR_PRESS
-    BCF	    CONTANDO	    ;CONTANDO = 0 
-    GOTO    LACO_PRINCIPAL  ;pula para LACO_PRINCIPAL 
-PARADO
-    BTFSS   B_INICIAR	    ;testa se o botão B_INICIAR está liberado
-    GOTO    B_INICIAR_PRESS ;se pressionado pule para B_INICIAR_PRESS
-    BTFSC   B_ZERAR	    ;testa se o botão B_ZERAR está liberado
-    GOTO    LACO_PRINCIPAL  ;se não pressionado pule para LACO_PRINCIPAL 
-    CLRF    UNIDADE	    ;UNIDADE = 0  
-    CLRF    DEZENA	    ;DEZENA = 0
-    GOTO    LACO_PRINCIPAL  ;pula para LACO_PRINCIPAL
- 
-B_INICIAR_PRESS
-    BSF	    CONTANDO	    ;CONTANDO = 1
-    BCF	    FIM_TEMPO	    ;FIM_TEMPO = 0
-    BCF	    FIM_LED	    ;FIM_LED = 0    
-    MOVLW   V_CONT	    ;W = V_CONT
-    MOVWF   CONTADOR	    ;CONTADOR = V_CONT
-    MOVLW   V_CONT2	    ;W = V_CONT2
-    MOVWF   CONTADOR2	    ;CONTADOR2 = V_CONT2
-    GOTO    LACO_PRINCIPAL  ;pula para LACO_PRINCIPAL    
- 
-TROCA_LED
-    BCF	    FIM_LED	    ;FIM_LED = 0
-    GOTO    ACENDE_LED	    ;se LED = 0, pula para ACENDE_LED
-    RETURN		    ;retorna da chamada de subrotina  
-ACENDE_LED
-    RETURN		    ;retorna da chamada de subrotina
-    
-TROCA_DISPLAY
-    BCF	    INT_ATIVA	    ;INT_ATIVA = 0
-    
-    BTFSC   D_UNIDADE	    ;testa se o display da UNIDADE está acesso
-    GOTO    ACENDE_UNIDADE    ;se UNIDADE não estiver acesa, pula para TESTA_DEZENA
-    BTFSC   D_DEZENA
-    GOTO    ACENDE_DEZENA
-    BTFSC   D_CENTENA
-    GOTO    ACENDE_CENTENA
-    GOTO    ACENDE_MILHAR
-ACENDE_DEZENA
-    BCF	    D_UNIDADE	    ;apaga o display da UNIDADE
-    BCF	    D_CENTENA	    ;apaga o display da UNIDADE
-    BCF	    D_MILHAR	    ;apaga o display da UNIDADE
-    BCF	    D_DEZENA	    ;apaga o display da UNIDADE
-    MOVF    CENTENA,W	    ;W = DEZENA
-    CALL    BUSCA_CODIGO    ;chama a subrotina para buscar o código de 7 segmentos
-    MOVWF   DISPLAYS	    ;DISPLAYS = W (código de 7 segmentos)
-    BSF	    D_CENTENA	    ;ativa o display da DEZENA
-    RETURN		    ;retorna da chamada de subrotina
-ACENDE_UNIDADE
-    BCF	    D_UNIDADE	    ;apaga o display da UNIDADE
-    BCF	    D_CENTENA	    ;apaga o display da UNIDADE
-    BCF	    D_MILHAR	    ;apaga o display da UNIDADE
-    BCF	    D_DEZENA	    ;apaga o display da UNIDADE
-    MOVF    DEZENA,W	    ;W = UNIDADE
-    CALL    BUSCA_CODIGO2    ;chama a subrotina para buscar o código de 7 segmentos
-    MOVWF   DISPLAYS	    ;DISPLAYS = W (código de 7 segmentos)
-    BSF	    D_DEZENA	    ;ativa o display da UNIDADE
-    RETURN		    ;retorna da chamada de subrotina    
-ACENDE_CENTENA
-    BCF	    D_UNIDADE	    ;apaga o display da UNIDADE
-    BCF	    D_CENTENA	    ;apaga o display da UNIDADE
-    BCF	    D_MILHAR	    ;apaga o display da UNIDADE
-    BCF	    D_DEZENA	    ;apaga o display da UNIDADE
-    MOVF    MILHAR,W	    ;W = UNIDADE
-    CALL    BUSCA_CODIGO    ;chama a subrotina para buscar o código de 7 segmentos
-    MOVWF   DISPLAYS	    ;DISPLAYS = W (código de 7 segmentos)
-    BSF	    D_MILHAR	    ;ativa o display da UNIDADE
-    RETURN		    ;retorna da chamada de subrotina  
-ACENDE_MILHAR
-    BCF	    D_UNIDADE	    ;apaga o display da UNIDADE
-    BCF	    D_CENTENA	    ;apaga o display da UNIDADE
-    BCF	    D_MILHAR	    ;apaga o display da UNIDADE
-    BCF	    D_DEZENA	    ;apaga o display da UNIDADE
+    BTFSC   PISCANDO	    ;testa se pisca n o est  ativo
+    GOTO    TESTA_DESLIGA   ;se estiver ativo, pule para testar o bot o DESLIGA
+    BTFSC   B_LIGA	    ;testa se o bot o LIGA est  acionado
+    GOTO    TESTA_B_INC	    ;se n o estiver acionado, pule para LACO_PRINCIPAL
+    BSF	    LAMPADA	    ;acende a l mpada
+    BSF	    PISCANDO	    ;seta a booleana PISCANDO
+    MOVLW   V_TMR0	    ;carrega o valor inicial do TMR0 em W
+    MOVWF   TMR0	    ;carrega o valor no TMR0
+    ;CALL    MUDA_FREQ
+    BCF	    FIM_TEMPO	    ;zera a boolena FIM_TEMPO
+    GOTO    LACO_PRINCIPAL  ;pule para LACO_PRINCIPAL    
+TESTA_DESLIGA
+    BTFSC   B_DESLIGA	    ;testa se o bot o DESLIGA est  acionado
+    GOTO    TESTA_FIM_TEMPO ;se n o estiver acionado, pule para TESTA_FIM_TEMPO
+    BCF	    LAMPADA	    ;apaga a l mpada
+    BCF	    PISCANDO	    ;limpa a booleana PISCANDO    
+    GOTO    LACO_PRINCIPAL  ;pule para LACO_PRINCIPAL 
+TESTA_FIM_TEMPO
+    BTFSS   FIM_TEMPO	    ;testa se o intervalo de tempo expirou
+    GOTO    LACO_PRINCIPAL  ;se n o, pule para LACO_PRINCIPAL
+    BCF     FIM_TEMPO	    ;limpa o indicador de fim de tempo
+    BTFSS   LAMPADA	    ;testa se a l mpada acesa
+    GOTO    ACENDE_LAMPADA  ;se l mpada apagada, pule para ACENDE_LAMPADA	
+    BCF	    LAMPADA	    ;apaga a l mpada
+    GOTO    LACO_PRINCIPAL  ;pule para LACO_PRINCIPAL    
+ACENDE_LAMPADA
+    BSF	    LAMPADA	    ;acende a l mpada
+    GOTO    LACO_PRINCIPAL  ;pule para LACO_PRINCIPAL  
+;======================================================= TESTES E FILTROS
+TESTA_B_INC
+    BTFSS   B_FREQ_UP
+    GOTO    INCREMENTA
+    MOVLW   V_FILTRO
+    MOVWF   FILTRO_INC
+    BCF	    JA_LI_UP
+TESTA_B_DEC
+    BTFSS   B_FREQ_DOWN
+    GOTO    DECREMENTA
+    MOVLW   V_FILTRO
+    MOVWF   FILTRO_DEC
+    BCF	    JA_LI_DOWN
+    GOTO    LACO_PRINCIPAL
+;======================================================= CONTADORES    
+INCREMENTA
+    BTFSC   JA_LI_UP
+    GOTO    LACO_PRINCIPAL
+    DECFSZ  FILTRO_INC,F
+    GOTO    LACO_PRINCIPAL
+    BSF	    JA_LI_UP
+    INCF    UNIDADE,F		    ;incrementa o valor da UNIDADE
+    MOVLW   .10			    ;carrega 10 em W (W = 10)
+    SUBWF   UNIDADE,W		    ;subtrai 10 da UNIDADE, resultado em W (W = UNIDADE - W)
+    BTFSC   STATUS,C		    ;testa se o resultado foi negativo
+    CLRF    UNIDADE		    ;se UNIDADE > 9; fa a UNIDADE = 0 
+    CALL    ESCREVE_DISPLAY
+    CALL    MUDA_FREQ
+    GOTO    LACO_PRINCIPAL
+DECREMENTA
+    BTFSC   JA_LI_DOWN
+    GOTO    LACO_PRINCIPAL
+    DECFSZ  FILTRO_DEC,F
+    GOTO    LACO_PRINCIPAL
+    BSF	    JA_LI_DOWN
+    DECFSZ  FILTRO_DEC,F
+    MOVF    UNIDADE,W
+    XORLW   .0
+    BTFSC   STATUS,Z
+    CALL    MOVE_10W
+    DECF    UNIDADE,F
+    CALL    ESCREVE_DISPLAY
+    CALL    MUDA_FREQ
+    GOTO    LACO_PRINCIPAL
+;======================================================= FUN  ES PRONTAS
+MOVE_10W
+    MOVLW   .10
+    MOVWF   UNIDADE
+    RETURN
+ESCREVE_DISPLAY
     MOVF    UNIDADE,W	    ;W = UNIDADE
-    CALL    BUSCA_CODIGO    ;chama a subrotina para buscar o código de 7 segmentos
-    MOVWF   DISPLAYS	    ;DISPLAYS = W (código de 7 segmentos)
-    BSF	    D_UNIDADE	    ;ativa o display da UNIDADE
-    RETURN		    ;retorna da chamada de subrotina  
-    
+    CALL    BUSCA_CODIGO    ;chama a subrotina para buscar o c digo a ser escrito no display
+    MOVWF   DISPLAY	    ;escreve o valor no display (PORTB)
+    RETURN
+BUSCA_CODIGO
+    ADDWF   PCL,F	    ; PC = PC + W (UNIDADE)
+    RETLW   B'11111110'	    ;retorna com o valor 0xFE em W
+    RETLW   B'00111000'	    ;retorna com o valor 0x38 em W    
+    RETLW   B'11011101'	    ;retorna com o valor 0xDD em W
+    RETLW   B'01111101'	    ;retorna com o valor 0x7D em W    
+    RETLW   B'00111011'	    ;retorna com o valor 0x3B em W
+    RETLW   B'01110111'	    ;retorna com o valor 0x77 em W    
+    RETLW   B'11110111'	    ;retorna com o valor 0xF7 em W
+    RETLW   B'00111100'	    ;retorna com o valor 0x3C em W     
+    RETLW   B'11111111'	    ;retorna com o valor 0xFF em W
+    RETLW   B'01111111'	    ;retorna com o valor 0x7F em W 
+;=======================================================    
+;FUN  ES RESPONSAVEIS POR MUDAR A FREQUECINCA
+;RETORNAM UMA LITERAL PARA O AUX_CONT TODA VEZ QUE A UNIDADE   TROCADA
+;ASSIM MUDANDO A FREQUENCIA EM QUE A LAMPADA PISCA
+MUDA_FREQ
+    MOVF    UNIDADE,W	    ;W = UNIDADE
+    CALL    BUSCA_FREQ	    ;chama a subrotina para buscar o c digo a ser escrito no display
+    MOVWF   AUX_CONT	    ;escreve o valor no display (PORTB)
+    RETURN
+BUSCA_FREQ
+    ADDWF   PCL,F	    ; PC = PC + W (UNIDADE)
+    RETLW   .250	    ;retorna com o valor 0xFE em W
+    RETLW   .125	    ;retorna com o valor 0x38 em W    
+    RETLW   .100	    ;retorna com o valor 0xDD em W
+    RETLW   .75		    ;retorna com o valor 0x7D em W    
+    RETLW   .60		    ;retorna com o valor 0x3B em W
+    RETLW   .50		    ;retorna com o valor 0x77 em W    
+    RETLW   .40		    ;retorna com o valor 0xF7 em W
+    RETLW   .30		    ;retorna com o valor 0x3C em W     
+    RETLW   .25		    ;retorna com o valor 0xFF em W
+    RETLW   .20		    ;retorna com o valor 0x7F em W 
+;=======================================================
 
-    
     END
