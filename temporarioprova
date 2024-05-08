@@ -31,13 +31,15 @@
     Y_H
     Y_L
     DELAY_ADC
+    QUAL_CANAL
+    HISTERESE
  ENDC
  
 #define ACAO		FLAGS,0
 #define INT_ATIVA	FLAGS,1
 #define FIM_TEMPO	FLAGS,2
 #define EH_NEGATIVO	FLAGS,3
-#define QUAL_CANAL	FLAGS,4
+#define JA_LI		FLAGS,4
 #define AQUECENDO	FLAGS,5 
  
 #define DISPLAY		PORTD
@@ -45,8 +47,8 @@
 #define D_DEZENA	PORTB,5
 #define D_CENTENA	PORTB,6
 #define D_MILHAR	PORTB,7
-#define B_POT		PORTB,1
-#define B_TEMP		PORTB,2
+#define B_CANAL		PORTB,1
+#define	B_AUMENTA	PORTB,2
 #define LIGA		PORTB,0
 #define DESLIGA		PORTB,3
 #define HEATER		PORTC,2
@@ -119,22 +121,29 @@ START
     MOVWF   CONTADOR
     BCF     ACAO
     BCF     INT_ATIVA
-    BSF     QUAL_CANAL
+    BCF     QUAL_CANAL,0
+    BCF	    QUAL_CANAL,1
     BCF     HEATER
+    MOVLW   .0
+    MOVWF   HISTERESE
     MOVLW   V_TMR0
     MOVWF   TMR0
     BSF     INTCON,T0IE		;PERMITE ATENDER INTERRUPCOES POR TMR0
     BSF     INTCON,GIE		;PERMITE ATENDER INTERRUPCOES
+    
+ZERA_JA_LI    
+    BCF	    JA_LI	    ;zera a variável JA_LI
+    MOVLW   V_FILTRO	    ;W = V_FILTRO
+    MOVWF   FILTRO	    ;FILTRO = V_FILTRO
 LACO_PRINCIPAL
-    BTFSS   B_TEMP		;TESTA SE BOTAO DE TEMPERATURA FOI PRESSIONADO
-    BCF     QUAL_CANAL		;QUAL_CANAL = 0
-    BTFSS   B_POT		;TESTA SE BOTAO DE POTENCIOMETRO FOI PRESSIONADO
-    BSF     QUAL_CANAL		;QUAL_CANAL = 1
+    BTFSS   B_CANAL		;TESTA SE BOTAO DE TEMPERATURA FOI PRESSIONADO
+    CALL    LE_CANAL
     BTFSS   LIGA		;TESTA SE BOTAO LIGAR FOI PRESSIONADO
     BSF     AQUECENDO		;ATIVA BIT AUXILIAR DE AQUECENDO
     BTFSS   DESLIGA		;TESTA SE BOTAO DESLIGAR FOI PRESSIONADO
     CALL    DESLIGA_AQUECENDO	;CHAMA SUBROTINA PARA DESLIGAR O AQUECENDO
-    
+    BTFSS   B_AUMENTA
+    CALL    LE_AUMENTA
     BTFSC   INT_ATIVA
     CALL    ATUALIZA_DISPLAY
     BTFSS   FIM_TEMPO
@@ -177,7 +186,7 @@ LACO_PRINCIPAL
     MOVWF   VALOR_ADC1_L    ;carrega na vari vel VALOR_ADC1_L
     BTFSC   AQUECENDO
     CALL    CONTROLA_AQUECENDO
-    BTFSS   QUAL_CANAL
+    BTFSS   QUAL_CANAL,0
     GOTO    MOSTRA_CANAL_0
 MOSTRA_CANAL_1          ;preparar para mostrar o canal 1
     MOVF    VALOR_ADC1_H,W
@@ -340,6 +349,29 @@ BUSCA_CODIGO
     RETLW   .127    ;8 
     RETLW   .111    ;9 
     RETLW   .0      ;APAGADO    
+    
+    
+LE_CANAL
+    BTFSC   B_CANAL	    ;lê e testa o bit 1 do PORTA
+    GOTO    ZERA_JA_LI	    ;se "1" pula para ZERA_JA_LI
+    BTFSC   JA_LI	    ;testa o JA_LI
+    GOTO    LE_CANAL	    ;se "1", pula para LE_BOTAO   
+    DECFSZ  FILTRO,F	    ;decrementa FILTRO e testa se é igual a 0
+    GOTO    LE_CANAL	    ;se não for zero, pula para LE_BOTAO
+    BSF	    JA_LI	    ;JA_LI = 1   
+    INCF    QUAL_CANAL
+    RETURN
+    
+LE_AUMENTA
+    BTFSC   B_AUMENTA	    ;lê e testa o bit 1 do PORTA
+    GOTO    ZERA_JA_LI	    ;se "1" pula para ZERA_JA_LI
+    BTFSC   JA_LI	    ;testa o JA_LI
+    GOTO    LE_AUMENTA	    ;se "1", pula para LE_BOTAO   
+    DECFSZ  FILTRO,F	    ;decrementa FILTRO e testa se é igual a 0
+    GOTO    LE_AUMENTA	    ;se não for zero, pula para LE_BOTAO
+    BSF	    JA_LI	    ;JA_LI = 1   
+    INCF    HISTERESE
+    RETURN
     
     
 END
