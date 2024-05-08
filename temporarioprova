@@ -50,7 +50,7 @@
 #define B_CANAL		PORTB,1
 #define	B_AUMENTA	PORTB,2
 #define LIGA		PORTB,0
-#define DESLIGA		PORTB,3
+#define B_DIMINUI	PORTB,3
 #define HEATER		PORTC,2
 
  
@@ -139,11 +139,11 @@ LACO_PRINCIPAL
     BTFSS   B_CANAL		;TESTA SE BOTAO DE TEMPERATURA FOI PRESSIONADO
     CALL    LE_CANAL
     BTFSS   LIGA		;TESTA SE BOTAO LIGAR FOI PRESSIONADO
-    BSF     AQUECENDO		;ATIVA BIT AUXILIAR DE AQUECENDO
-    BTFSS   DESLIGA		;TESTA SE BOTAO DESLIGAR FOI PRESSIONADO
-    CALL    DESLIGA_AQUECENDO	;CHAMA SUBROTINA PARA DESLIGAR O AQUECENDO
+    CALL    LE_LIGA		;
     BTFSS   B_AUMENTA
     CALL    LE_AUMENTA
+    BTFSS   B_DIMINUI
+    CALL    LE_DIMINUI
     BTFSC   INT_ATIVA
     CALL    ATUALIZA_DISPLAY
     BTFSS   FIM_TEMPO
@@ -372,6 +372,36 @@ LE_AUMENTA
     BSF	    JA_LI	    ;JA_LI = 1   
     INCF    HISTERESE
     RETURN
+
+LE_DIMINUI
+    BTFSC   B_DIMINUI	    ;lê e testa o bit 1 do PORTA
+    GOTO    ZERA_JA_LI	    ;se "1" pula para ZERA_JA_LI
+    BTFSC   JA_LI	    ;testa o JA_LI
+    GOTO    LE_DIMINUI	    ;se "1", pula para LE_BOTAO   
+    DECFSZ  FILTRO,F	    ;decrementa FILTRO e testa se é igual a 0
+    GOTO    LE_DIMINUI	    ;se não for zero, pula para LE_BOTAO
+    BSF	    JA_LI	    ;JA_LI = 1   
+    DECF    HISTERESE
+    RETURN
+
+LE_LIGA
+    BTFSC   LIGA	    ;lê e testa o bit 1 do PORTA
+    GOTO    ZERA_JA_LI	    ;se "1" pula para ZERA_JA_LI
+    BTFSC   JA_LI	    ;testa o JA_LI
+    GOTO    LE_LIGA	    ;se "1", pula para LE_BOTAO   
+    DECFSZ  FILTRO,F	    ;decrementa FILTRO e testa se é igual a 0
+    GOTO    LE_LIGA	    ;se não for zero, pula para LE_BOTAO
+    BSF	    JA_LI	    ;JA_LI = 1 
+    BTFSS   AQUECENDO
+    GOTO    ON
+    GOTO    OFF
     
     
+ON
+    BSF	    AQUECENDO
+    RETURN
+    
+OFF
+    BCF	    AQUECENDO
+    RETURN
 END
